@@ -38,8 +38,8 @@ const apply_slope_decel = (m, decelCoef) => {
 const update_walking_speed = (m) => {
     let maxTargetSpeed, targetSpeed
 
-    if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 24
-    else maxTargetSpeed = 170
+    if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 200
+    else maxTargetSpeed = 200
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 

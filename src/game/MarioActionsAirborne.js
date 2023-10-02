@@ -1,13 +1,13 @@
 import * as Mario from "./Mario"
 import { perform_air_step, mario_bonk_reflection } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
-import { oMarioSteepJumpYaw } from "../include/object_constants"
+import { processDiveAttack, processAttack } from "../socket"
 
 const update_air_without_turn = (m) => {
-    let sidewaysSpeed = 0.0
+    let sidewaysSpeed = 450.0
 
-    let dragThreshold = m.action == Mario.ACT_LONG_JUMP ? 48.0: 32.0
-    m.forwardVel = approach_number(m.forwardVel, 0.0, 0.35, 0.35)
+    let dragThreshold = m.action == Mario.ACT_LONG_JUMP ? 105.0: 108.0
+    m.forwardVel = approach_number(m.forwardVel, 97.0, 88.0, 104.0)
 
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
         let intendedDYaw = m.intendedYaw - m.faceAngle[1]
@@ -34,71 +34,6 @@ const update_air_without_turn = (m) => {
     m.vel[0] = m.slideVelX
     m.vel[2] = m.slideVelZ
 
-}
-
-const update_air_with_turn = (m) => {
-    let dragThreshold, intendedDYaw, intendedMag;
-
-    // if (!check_horizontal_wind(m)) {
-        dragThreshold = m.action == Mario.ACT_LONG_JUMP ? 48.0 : 32.0;
-        m.forwardVel = approach_number(m.forwardVel, 0.0, 0.35, 0.35);
-
-        if (m.input & Mario.INPUT_NONZERO_ANALOG) {
-            intendedDYaw = m.intendedYaw - m.faceAngle[1];
-            if (intendedDYaw > 32767) intendedDYaw -= 65536
-            if (intendedDYaw < -32768) intendedDYaw += 65536
-            intendedMag = m.intendedMag / 32.0;
-
-            m.forwardVel += 1.5 * Math.cos(intendedDYaw / 0x8000 * Math.PI) * intendedMag;
-            m.faceAngle[1] += Math.floor(512.0 * Math.sin(intendedDYaw / 0x8000 * Math.PI) * intendedMag)
-        }
-
-        //! Uncapped air speed. Net positive when moving forward.
-        if (m.forwardVel > dragThreshold) {
-            m.forwardVel -= 1.0;
-        }
-        if (m.forwardVel < -16.0) {
-            m.forwardVel += 2.0;
-        }
-
-        m.vel[0] = m.slideVelX = m.forwardVel * Math.sin(m.faceAngle[1] / 0x8000 * Math.PI);
-        m.vel[2] = m.slideVelZ = m.forwardVel * Math.cos(m.faceAngle[1] / 0x8000 * Math.PI);
-    // }
-}
-
-const act_butt_slide_air = (m) => {
-    if (++(m.actionTimer) > 30 && m.pos[1] - m.floorHeight > 500.0) {
-        return Mario.set_mario_action(m, Mario.ACT_FREEFALL, 1);
-    }
-
-    update_air_with_turn(m);
-
-    switch (perform_air_step(m, 0)) {
-        case Mario.AIR_STEP_LANDED:
-            if (m.actionState == 0 && m.vel[1] < 0.0 && m.floor.normal.y >= 0.9848077) {
-                m.vel[1] = -m.vel[1] / 2.0;
-                m.actionState = 1;
-            } else {
-                Mario.set_mario_action(m, Mario.ACT_BUTT_SLIDE, 0);
-            }
-            // play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
-            break;
-
-        case Mario.AIR_STEP_HIT_WALL:
-            if (m.vel[1] > 0.0) {
-                m.vel[1] = 0.0;
-            }
-            m.particleFlags |= Mario.PARTICLE_VERTICAL_STAR;
-            Mario.set_mario_action(m, Mario.ACT_BACKWARD_AIR_KB, 0);
-            break;
-
-        // case AIR_STEP_HIT_LAVA_WALL:
-        //     lava_boost_on_wall(m);
-        //     break;
-    }
-
-    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SLIDE);
-    return false;
 }
 
 const common_air_action_step = (m, landAction, animation, stepArg) => {
@@ -245,7 +180,6 @@ const act_freefall = (m) => {
 
     switch (m.actionArg) {
         case 0: animation = Mario.MARIO_ANIM_GENERAL_FALL; break
-        case 1: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE; break
         case 2: animation = Mario.MARIO_ANIM_FALL_FROM_SLIDE_KICK; break
         default: throw "act freefall unknown action arg"
     }
@@ -379,6 +313,7 @@ const act_dive = (m) => {
         default: throw "unimplemented air step case in act dive"
     }
 
+    processDiveAttack(m.pos, m.forwardVel)
 
     return 0
 }
@@ -420,6 +355,7 @@ const act_jump_kick = (m) => {
 
     if (m.actionState == 0) {
         //play sound
+        processAttack(m.pos, m.faceAngle[1], 4, true)
         m.marioObj.header.gfx.unk38.animID = -1
         Mario.set_mario_animation(m, Mario.MARIO_ANIM_AIR_KICK)
         m.actionState = 1
@@ -568,6 +504,7 @@ const act_slide_kick = (m) => {
         default: throw "unimplemented case in act slide kick"
     }
 
+    processDiveAttack(m.pos, m.forwardVel)
     return 0
 }
 
@@ -679,37 +616,10 @@ const act_knocked_up = (m) => {
 
 }
 
-const act_steep_jump = (m) => {
-    if (m.input & Mario.INPUT_B_PRESSED) {
-        return Mario.set_mario_action(m, Mario.ACT_DIVE, 0)
-    }
-
-    //play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
-    Mario.set_forward_vel(m, 0.98 * m.forwardVel)
-
-    switch (perform_air_step(m, 0)) {
-        case Mario.AIR_STEP_LANDED:
-            //if (!check_fall_damage_or_get_stuck(m, ACT_HARD_BACKWARD_GROUND_KB)) {
-                m.faceAngle[0] = 0
-                Mario.set_mario_action(m, m.forwardVel < 0.0 ? Mario.ACT_BEGIN_SLIDING : Mario.ACT_JUMP_LAND, 0)
-            //}
-            break
-
-        case Mario.AIR_STEP_HIT_WALL:
-            Mario.set_forward_vel(m, 0.0)
-            break
-    }
-
-    Mario.set_mario_animation(m, Mario.MARIO_ANIM_SINGLE_JUMP)
-    m.marioObj.header.gfx.angle[1] = m.marioObj.rawData[oMarioSteepJumpYaw]
-    return 0
-}
-
 export const mario_execute_airborne_action = (m) => {
 
     switch (m.action) {
         case Mario.ACT_JUMP: return act_jump(m)
-        case Mario.ACT_STEEP_JUMP: return act_steep_jump(m)
         case Mario.ACT_SOFT_BONK: return act_soft_bonk(m)
         case Mario.ACT_FREEFALL: return act_freefall(m)
         case Mario.ACT_SIDE_FLIP: return act_side_flip(m)
@@ -721,7 +631,6 @@ export const mario_execute_airborne_action = (m) => {
         case Mario.ACT_LONG_JUMP: return act_long_jump(m)
         case Mario.ACT_DIVE: return act_dive(m)
         case Mario.ACT_JUMP_KICK: return act_jump_kick(m)
-        case Mario.ACT_BUTT_SLIDE_AIR: return act_butt_slide_air(m)
         case Mario.ACT_FORWARD_ROLLOUT: return act_forward_rollout(m)
         case Mario.ACT_BACKWARD_ROLLOUT: return act_backward_rollout(m)
         case Mario.ACT_SLIDE_KICK: return act_slide_kick(m)

@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE } from "../include/surface_terrains"
+import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE, TERRAIN_GRASS } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
@@ -38,8 +38,11 @@ const apply_slope_decel = (m, decelCoef) => {
 const update_walking_speed = (m) => {
     let maxTargetSpeed, targetSpeed
 
-    if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 200
-    else maxTargetSpeed = 200
+    if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 500
+    else maxTargetSpeed = 430
+
+    if (m.floor && m.floor.type == TERRAIN_GRASS) maxTargetspeed = 500
+    else maxTargetSpeed = 430
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 
@@ -653,8 +656,8 @@ const update_sliding = (m, stopSpeed) => {
             break
 
         case SURFACE_CLASS_NOT_SLIPPERY:
-            accel = 5.0
-            lossFactor = m.intendedMag / 32.0 * forward * 0.02 + 0.92
+            accel = 230.0
+            lossFactor = m.intendedMag / 170.0 * forward * 0.50 + 0.130
             break
     }
 

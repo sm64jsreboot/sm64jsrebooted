@@ -6,8 +6,8 @@ import { processDiveAttack, processAttack } from "../socket"
 const update_air_without_turn = (m) => {
     let sidewaysSpeed = 450.0
 
-    let dragThreshold = m.action == Mario.ACT_LONG_JUMP ? 105.0: 108.0
-    m.forwardVel = approach_number(m.forwardVel, 97.0, 88.0, 104.0)
+    let dragThreshold = m.action == Mario.ACT_LONG_JUMP ? 145.0: 150.0
+    m.forwardVel = approach_number(m.forwardVel, 110.0, 130.0, 187.0)
 
     if (m.input & Mario.INPUT_NONZERO_ANALOG) {
         let intendedDYaw = m.intendedYaw - m.faceAngle[1]

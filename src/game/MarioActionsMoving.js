@@ -1,5 +1,5 @@
 import * as Mario from "./Mario"
-import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE, TERRAIN_GRASS } from "../include/surface_terrains"
+import { SURFACE_SLOW, SURFACE_CLASS_VERY_SLIPPERY, SURFACE_CLASS_SLIPPERY, SURFACE_CLASS_NOT_SLIPPERY, TERRAIN_MASK, TERRAIN_SLIDE, TERRAIN_GRASS, TERRAIN_STONE } from "../include/surface_terrains"
 import { perform_ground_step } from "./MarioStep"
 import { approach_number, atan2s } from "../engine/math_util"
 import { oMarioWalkingPitch } from "../include/object_constants"
@@ -42,6 +42,7 @@ const update_walking_speed = (m) => {
     else maxTargetSpeed = 430
 
     if (m.floor && m.floor.type == TERRAIN_GRASS) maxTargetspeed = 500
+    (m.area.terrainType & TERRAIN_GRASS) == TERRAIN_STONE
     else maxTargetSpeed = 430
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed

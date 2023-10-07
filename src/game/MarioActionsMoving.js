@@ -38,24 +38,27 @@ const apply_slope_decel = (m, decelCoef) => {
 const update_walking_speed = (m) => {
     let maxTargetSpeed, targetSpeed
 
-    if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 500
-    else maxTargetSpeed = 430
+    if (m.floor && m.floor.type == SURFACE_SLOW) maxTargetSpeed = 157
+    else maxTargetSpeed = 157
 
-    if (m.floor && m.floor.type == TERRAIN_GRASS) maxTargetspeed = 500
+    if (m.floor && m.floor.type == TERRAIN_GRASS) maxTargetspeed = 157
     (m.area.terrainType & TERRAIN_GRASS) == TERRAIN_STONE
-    else maxTargetSpeed = 430
+    else maxTargetSpeed = 157
 
     targetSpeed = m.intendedMag < maxTargetSpeed ? m.intendedMag : maxTargetSpeed
 
     if (m.forwardVel <= 0.0) {
-        m.forwardVel += 170.0
+        m.forwardVel += 195.0
     } else if (m.forwardVel <= targetSpeed) {
-        m.forwardVel += 200.0 - m.forwardVel / 180.0
-    } else if (m.floor.normal.y >= 300.0) {
-        m.forwardVel -= 300.0
+        m.forwardVel += 182.0 - m.forwardVel / 185.0
+    } else if (m.floor.normal.y >= 180.0) {
+        m.forwardVel -= 183.0
     }
 
-    if (m.forwardVel > 300.0) m.forwardVel = 300.0
+    if (m.forwardVel > 180.0) m.forwardVel = 185.0
+
+    
+
 
     //m.faceAngle[1] = m.intendedYaw //cheat super responsive controls
 
@@ -64,7 +67,7 @@ const update_walking_speed = (m) => {
     number16 = number16 < -32768 ? number16 + 65536 : number16
     m.faceAngle[1] = m.intendedYaw - approach_number(number16, 0, 0x800, 0x800)
 
-    m.forwardVel = 300.0
+
 
     apply_slope_accel(m)
 
@@ -738,7 +741,7 @@ const act_crouch_slide = (m) => {
     if (m.actionTimer < 30) {
         m.actionTimer++
         if (m.input & Mario.INPUT_A_PRESSED) {
-            if (m.forwardVel > 10.0) {
+            if (m.forwardVel > 70.0) {
                 return Mario.set_jumping_action(m, Mario.ACT_LONG_JUMP, 0)
             }
         }

@@ -1,47 +1,34 @@
-# sm64js
+# sm64js2020archive
 
 ### Links
-[Main Website: sm64js.com](https://sm64js.com)
+[Main Website: sm64js.com](https://sm64js2020archive.000webhostapp.com/)
 
-[Discord Server](https://discord.gg/7UaDnJt)
 
 ## What is this?
-This is an ongoing work-in-progress port of the decompilation of original Nintendo game, Super Mario 64, to native Javascript (no emulation or web assembly). The project involved creating a Javascript WebGL port of N64 Fast 3D Renderer, originally implemented with OpenGL in C.  This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
+This is an ongoing work-in-progress port of the decompilation of original Nintendo game, Super Mario 64, to native Javascript (no emulation or web assembly). The project involved creating a Javascript WebGL port of N64 Fast 3D Renderer, originally implemented with OpenGL in C.  This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes, And a 2020 working version of sm64js.
 
 ## Build instructions - Windows, Mac, or Linux
-
-### First install Docker
-* Windows - [Install Instructions](https://docs.docker.com/docker-for-windows/install-windows-home/)
-* Mac - [Install Instructions](https://docs.docker.com/docker-for-mac/install/)
-* Linux - [Install Instructions](https://docs.docker.com/engine/install/#server)
-
-### Run these commands
 ```bash
-# Create and start lightweight docker container with NodeJs
-docker run --name mySm64JsServer -dp 80:80 node:13 tail -f /dev/null
-# Connect to the docker container's shell
-docker exec -it mySm64JsServer /bin/sh
-
-# Install additional prerequisites
-apk update && apk add git
-# Clone the source code
-git clone https://github.com/sm64js/sm64js.git && cd sm64js
-
-# Install node packages, build, and serve
-npm run quickstart
-```
-You should now be able to access the website with the game from a web browser by typing "localhost" into the address bar.
+# Basic Steps (Getting the stuff you need for each OS)
+On windows ubuntu do: cd /mnt/DRIVENAMEHERE for example if you have an E: drive do /mnt/e or if u only have C: drive do /mnt/c
+On LINUX ubuntu type: Documents and go to your documents so that it can be ready to git clone.
+For MAC Linux Virtual Machine/Windows Virtual Machine: If your on a linux virtual machine do this: Documents
+If your on a windows virtual machine do: cd /mnt/c
+Now that ur ready do the steps below!
+If your on a windows computer: Download ubuntu from the microsoft store + Get the windows subsystem for linux.
+If your on linux computer then you dont have to install ubuntu since your machine will already have it.
+If your on a MAC computer you'll have get the "macOS / Intel hosts" build of virtualbox from their official website.
+Then make an ubuntu terminal account (IT DOESNT HAVE TO BE YOUR LOGIN INFO ON YOUR COMPUTER!)
 
 
-### Related Projects
-[Super Mario 64 Decomp](https://github.com/n64decomp/sm64)
- - Team that decompiled the original Super Mario 64 ROMs into C source code
+Build Steps
+In the ubuntu terminal do: git clone https://github.com/sm64jsreboot/sm64jsrebooted.git (Stay in the drive or folder you want!)
+Then do: cd sm64jsrebooted
+After that do: git checkout betatesterversion
+Then when its finished do the command in ubuntu: cd src
+Then do these 2 commands.
+Command 1: sudo apt update
+Command 2: sudo apt install --no-install-recommends php8.1
 
-[Super Mario 64 PC Port](https://github.com/sm64-port/sm64-port)
- - Team that ported the decompiled project to PC
-
-[N64 Fast 3D Renderer](https://github.com/Emill/n64-fast3d-engine)
- - OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
-(For this project, it was re-implemented in Javascript and WebGL)
-
-
+Now while in the "src" folder do: php -S localhost:9300
+                             

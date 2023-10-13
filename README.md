@@ -29,6 +29,6 @@ cd src
 sudo apt update
 sudo apt install --no-install-recommends php8.1
 
-// After its finished installing do
+## After its finished installing do
 php -S localhost:9300
                              

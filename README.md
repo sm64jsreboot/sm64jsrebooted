@@ -20,7 +20,7 @@ For MAC Linux Virtual Machine/Windows Virtual Machine: If your on a linux virtua
 ## Build instructions, Windows, Mac, or Linux
 ```bash
 /// Run these commands 1 at a time so it works
-git clone https://github.com/sm64jsreboot/sm64jsrebooted.git /// Stay in the drive or folder you want!
+git clone https://github.com/sm64jsreboot/sm64jsrebooted.git ## Stay in the drive or folder you want!
 cd sm64jsrebooted
 git checkout betatesterversion
 cd src
